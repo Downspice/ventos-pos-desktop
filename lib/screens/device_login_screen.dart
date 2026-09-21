@@ -3,6 +3,7 @@ import 'package:ventos_pos/config/api_config.dart';
 import 'package:ventos_pos/services/auth_repository.dart';
 import 'package:ventos_pos/services/graphql_client.dart';
 import 'package:ventos_pos/theme/ventos_colors.dart';
+import 'package:ventos_pos/widgets/ventos/auth_page_frame.dart';
 import 'package:ventos_pos/widgets/ventos/ventos.dart';
 
 class DeviceLoginScreen extends StatefulWidget {
@@ -54,28 +55,24 @@ class _DeviceLoginScreenState extends State<DeviceLoginScreen> {
   Widget build(BuildContext context) {
     return VentosScaffold(
       body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
+        child: AuthPageFrame(
+          title: 'Unlock this register',
+          description:
+              'Sign in with a manager or admin account to open the POS. '
+              'Staff will sign in on the next screen.',
+          footer: Text(
+            'API · ${ApiConfig.graphqlUrl}',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: VentosColors.textSoft,
+                ),
+            textAlign: TextAlign.center,
+          ),
           child: VentosCard(
-            padding: const EdgeInsets.all(28),
+            padding: const EdgeInsets.all(24),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Unlock this register',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Sign in with a manager or admin account to open the POS. '
-                  'Staff will sign in on the next screen.',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: VentosColors.mutedForeground,
-                        fontSize: 14,
-                      ),
-                ),
-                const SizedBox(height: 24),
                 VentosTextField(
                   controller: _email,
                   label: 'Email',
@@ -94,19 +91,24 @@ class _DeviceLoginScreenState extends State<DeviceLoginScreen> {
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 12),
-                  Text(_error!, style: const TextStyle(color: VentosColors.destructive, fontSize: 14)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: VentosColors.destructive.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: VentosColors.destructive.withValues(alpha: 0.25)),
+                    ),
+                    child: Text(
+                      _error!,
+                      style: const TextStyle(color: VentosColors.destructive, fontSize: 14),
+                    ),
+                  ),
                 ],
                 const SizedBox(height: 20),
                 VentosButtonFull(
                   onPressed: _submit,
                   label: 'Continue',
                   busy: _busy,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'API: ${ApiConfig.graphqlUrl}',
-                  style: Theme.of(context).textTheme.labelSmall,
-                  textAlign: TextAlign.center,
                 ),
               ],
             ),
