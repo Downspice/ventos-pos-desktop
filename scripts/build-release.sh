@@ -115,12 +115,22 @@ build_windows() {
     --build-name="$BUILD_VERSION" \
     --build-number="$BUILD_NUMBER"
   local out="build/windows/x64/runner/Release"
+  local out_abs="$APP_DIR/$out"
   local zip="$DIST/VentosPOS-Windows-${BUILD_VERSION}.zip"
+  mkdir -p "$DIST"
   if command -v powershell.exe >/dev/null 2>&1; then
+    # Pass paths via env — bash must not expand $D in D:\... when interpolating into -Command.
+    if command -v cygpath >/dev/null 2>&1; then
+      export WIN_OUT="$(cygpath -w "$out_abs")"
+      export WIN_ZIP="$(cygpath -w "$zip")"
+    else
+      export WIN_OUT="$out_abs"
+      export WIN_ZIP="$zip"
+    fi
     powershell.exe -NoProfile -Command \
-      "Compress-Archive -Path '${out}/*' -DestinationPath '${zip}' -Force"
+      'Compress-Archive -Path "$env:WIN_OUT\*" -DestinationPath $env:WIN_ZIP -Force'
   elif command -v zip >/dev/null 2>&1; then
-    (cd "$out" && zip -r "$zip" .)
+    (cd "$out_abs" && zip -r "$zip" .)
   else
     echo "No zip tool found; artifacts in $out" >&2
     return 0
