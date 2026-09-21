@@ -1,0 +1,79 @@
+name: Release desktop
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Resolve API URL
+        run: |
+          if [[ -z "${{ vars.VENTOS_API_URL }}" ]]; then
+            echo "Set repository variable VENTOS_API_URL (e.g. https://api.example.com/graphql)" >&2
+            exit 1
+          fi
+      - name: Build macOS release
+        env:
+          VENTOS_API_URL: ${{ vars.VENTOS_API_URL }}
+          VENTOS_WEB_URL: ${{ vars.VENTOS_WEB_URL }}
+        run: |
+          chmod +x scripts/build-release.sh
+          ./scripts/build-release.sh --platform macos
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VentosPOS-macOS
+          path: dist/**/*.zip
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Resolve API URL
+        shell: bash
+        run: |
+          if [[ -z "${{ vars.VENTOS_API_URL }}" ]]; then
+            echo "Set repository variable VENTOS_API_URL" >&2
+            exit 1
+          fi
+      - name: Build Windows release
+        shell: bash
+        env:
+          VENTOS_API_URL: ${{ vars.VENTOS_API_URL }}
+          VENTOS_WEB_URL: ${{ vars.VENTOS_WEB_URL }}
+        run: |
+          chmod +x scripts/build-release.sh
+          ./scripts/build-release.sh --platform windows
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VentosPOS-Windows
+          path: dist/**/*.zip
+
+  github-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true

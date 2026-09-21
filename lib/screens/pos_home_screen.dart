@@ -6,6 +6,7 @@ import 'package:ventos_pos/modules/module_router.dart';
 import 'package:ventos_pos/services/app_repository.dart';
 import 'package:ventos_pos/services/auth_repository.dart' show PosSessionState;
 import 'package:ventos_pos/services/pos_repository.dart';
+import 'package:ventos_pos/widgets/pos/staff_app_bar_menu.dart';
 import 'package:ventos_pos/widgets/ventos/ventos.dart';
 
 class PosHomeScreen extends StatefulWidget {
@@ -133,24 +134,11 @@ class _PosHomeScreenState extends State<PosHomeScreen> {
       appBar: AppBar(
         title: Text(selected.label),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: Center(
-              child: Text(
-                widget.session.activeEmployeeName ?? 'Staff',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ),
-          ),
-          VentosButton(
-            onPressed: widget.onSwitchStaff,
-            variant: VentosButtonVariant.ghost,
-            child: const Text('Switch staff'),
-          ),
-          VentosButton(
-            onPressed: widget.onDeviceLogout,
-            variant: VentosButtonVariant.ghost,
-            child: const Text('Lock device'),
+          StaffAppBarMenu(
+            displayName: widget.session.activeEmployeeName ?? 'Staff',
+            avatarUrl: widget.session.activeEmployeeAvatarUrl,
+            onLogOut: widget.onSwitchStaff,
+            onLockDevice: widget.onDeviceLogout,
           ),
         ],
       ),

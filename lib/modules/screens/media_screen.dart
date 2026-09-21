@@ -79,7 +79,7 @@ class _MediaScreenState extends State<MediaScreen> {
                     maxCrossAxisExtent: 220,
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
-                    childAspectRatio: 0.72,
+                    childAspectRatio: 0.68,
                   ),
                   itemCount: pageItems.length,
                   itemBuilder: (context, i) {
@@ -93,8 +93,7 @@ class _MediaScreenState extends State<MediaScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          AspectRatio(
-                            aspectRatio: 1,
+                          Expanded(
                             child: EntityImage(
                               imageUrl: url,
                               alt: a['altText'] as String? ?? filename,
@@ -103,9 +102,10 @@ class _MediaScreenState extends State<MediaScreen> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
                                   filename,
@@ -115,17 +115,21 @@ class _MediaScreenState extends State<MediaScreen> {
                                         fontWeight: FontWeight.w600,
                                       ),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 2),
                                 Text(
                                   _formatBytes(a['sizeBytes'] as int?),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                         color: VentosColors.mutedForeground,
                                       ),
                                 ),
                                 if (entityType != null && entityType.isNotEmpty) ...[
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 2),
                                   Text(
                                     entityType,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                           color: VentosColors.mutedForeground,
                                         ),

@@ -47,12 +47,14 @@ class PosSessionState {
     required this.businessName,
     required this.deviceUserEmail,
     this.activeEmployeeName,
+    this.activeEmployeeAvatarUrl,
     required this.permissions,
   });
 
   final String? businessName;
   final String? deviceUserEmail;
   final String? activeEmployeeName;
+  final String? activeEmployeeAvatarUrl;
   final List<String> permissions;
 
   bool get hasActiveStaff => activeEmployeeName != null;
@@ -63,14 +65,17 @@ class PosSessionState {
     final active = json['activeEmployee'] as Map<String, dynamic>?;
     final perms = json['permissions'] as List<dynamic>? ?? [];
     String? activeName;
+    String? activeAvatarUrl;
     if (active != null) {
       activeName =
           '${active['firstName']} ${active['lastName']}'.trim();
+      activeAvatarUrl = active['avatarUrl'] as String?;
     }
     return PosSessionState(
       businessName: business?['name'] as String?,
       deviceUserEmail: deviceUser?['email'] as String?,
       activeEmployeeName: activeName,
+      activeEmployeeAvatarUrl: activeAvatarUrl,
       permissions: perms.map((e) => e.toString()).toList(),
     );
   }
@@ -137,7 +142,7 @@ class AuthRepository {
         posSession {
           business { name }
           deviceUser { email }
-          activeEmployee { firstName lastName }
+          activeEmployee { firstName lastName avatarUrl }
           permissions
         }
       }
@@ -150,7 +155,7 @@ class AuthRepository {
     const document = r'''
       mutation Activate($employeeId: ID!, $password: String!) {
         activatePosEmployee(employeeId: $employeeId, password: $password) {
-          activeEmployee { firstName lastName }
+          activeEmployee { firstName lastName avatarUrl }
           permissions
         }
       }
